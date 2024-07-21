@@ -19,7 +19,6 @@ dependents_mapping = {"0": 0, "1": 1, "2": 2, "3+": 3}
 
 
 class InputData(BaseModel):
-    Loan_ID: str
     Gender: str
     Married: str
     Dependents: str
@@ -31,7 +30,6 @@ class InputData(BaseModel):
     Loan_Amount_Term: float
     Credit_History: float
     Property_Area: str
-    Loan_Status: str
 
 
 # Initialize FastAPI
@@ -70,6 +68,7 @@ def convertRequestToModelValue(data: dict):
 
 @app.post("/predict")
 def predict(data: InputData):
+    print('===========================================')
     # Convert input data to the required format for the model
     input_data = [convertRequestToModelValue(data.dict())]
 
@@ -81,4 +80,4 @@ def predict(data: InputData):
 
 
 if __name__ == '__main__':
-    uvicorn.run(app, host='0.0.0.0', port=5000)
+    uvicorn.run(app, host='127.0.0.1', port=8000)
