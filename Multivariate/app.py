@@ -1,10 +1,12 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+#!/usr/bin/env python3
+import uvicorn
 import joblib
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 # Load the trained model
-model = joblib.load("dementia.joblib")
+model = joblib.load("loan_model.joblib")
 
 # Mapping dictionaries
 gender_mapping = {"Female": 0, "Male": 1}
@@ -76,3 +78,7 @@ def predict(data: InputData):
 
     # Return the prediction as a response
     return {"prediction": round(prediction[0], 0)}
+
+
+if __name__ == '__main__':
+    uvicorn.run(app, host='0.0.0.0', port=5000)
