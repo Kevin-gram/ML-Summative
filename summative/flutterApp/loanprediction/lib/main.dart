@@ -41,45 +41,68 @@ class _LoanPredictionFormState extends State<LoanPredictionForm> {
   String loanStatus = 'N';
 
   Future<void> predictLoanStatus() async {
+    print('here');
     final url = Uri.parse('http://127.0.0.1:8000/predict');
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'Loan_ID': 'ID123', // Just a placeholder, the actual ID may vary
-        'Gender': gender,
-        'Married': married,
-        'Dependents': dependents,
-        'Education': education,
-        'Self_Employed': selfEmployed,
-        'ApplicantIncome': applicantIncome,
-        'CoapplicantIncome': coapplicantIncome,
-        'LoanAmount': loanAmount,
-        'Loan_Amount_Term': loanAmountTerm,
-        'Credit_History': creditHistory,
-        'Property_Area': propertyArea,
-        'Loan_Status': loanStatus,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      final result = json.decode(response.body);
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Prediction'),
-          content: Text('Loan Status: ${result['prediction']}'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
-            ),
-          ],
-        ),
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'Gender': gender,
+          'Married': married,
+          'Dependents': dependents,
+          'Education': education,
+          'Self_Employed': selfEmployed,
+          'ApplicantIncome': applicantIncome,
+          'CoapplicantIncome': coapplicantIncome,
+          'LoanAmount': loanAmount,
+          'Loan_Amount_Term': loanAmountTerm,
+          'Credit_History': creditHistory,
+          'Property_Area': propertyArea,
+          'Loan_Status': loanStatus,
+        }),
       );
-    } else {
-      throw Exception('Failed to load prediction');
+
+      if (response.statusCode == 200) {
+        print('==================================');
+        final result = json.decode(response.body);
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Prediction'),
+            content: Text('Loan Status: ${result['prediction']}'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('OK'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        print('==***************************************');
+        showErrorDialog(
+            'Failed to load prediction. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      showErrorDialog('Failed to load prediction. Error: $e');
     }
+  }
+
+  void showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -180,12 +203,24 @@ class _LoanPredictionFormState extends State<LoanPredictionForm> {
                 onChanged: (value) {
                   applicantIncome = double.parse(value);
                 },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter applicant income';
+                  }
+                  return null;
+                },
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Coapplicant Income'),
                 keyboardType: TextInputType.number,
                 onChanged: (value) {
                   coapplicantIncome = double.parse(value);
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter coapplicant income';
+                  }
+                  return null;
                 },
               ),
               TextFormField(
@@ -194,6 +229,12 @@ class _LoanPredictionFormState extends State<LoanPredictionForm> {
                 onChanged: (value) {
                   loanAmount = double.parse(value);
                 },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter loan amount';
+                  }
+                  return null;
+                },
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Loan Amount Term'),
@@ -201,12 +242,24 @@ class _LoanPredictionFormState extends State<LoanPredictionForm> {
                 onChanged: (value) {
                   loanAmountTerm = double.parse(value);
                 },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter loan amount term';
+                  }
+                  return null;
+                },
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Credit History'),
                 keyboardType: TextInputType.number,
                 onChanged: (value) {
                   creditHistory = double.parse(value);
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter credit history';
+                  }
+                  return null;
                 },
               ),
               DropdownButtonFormField<String>(
